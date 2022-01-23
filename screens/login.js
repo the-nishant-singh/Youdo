@@ -1,26 +1,32 @@
 import React, { useState } from "react";
-import { View, Text, Pressable , StyleSheet, TextInput, Image, ScrollView, ToastAndroid, ActivityIndicator, Modal } from "react-native";
-import { Login, SendResetPassEmail } from '../services/auth.service';
+import { View, Text, Pressable , StyleSheet, TextInput, Image, ToastAndroid, ActivityIndicator, Modal, Keyboard } from "react-native";
+import { useAuth } from '../services/auth.service';
+import { StackActions } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const LoginComponent = (props) => {
 
-  const [ email, setEmail ] = useState('')
-  const [ password, setPassword ] = useState('')
+  const [ email, setEmail ] = useState('nishantbihar529@gmail.com')
+  const [ password, setPassword ] = useState('Nishant@1234')
   const [ loading, setLoading ] = useState(false)
   const [ loadingSendReset, setLoadingSendReset ] = useState(false)
   const [ hidePass, setHidePass ] = useState(true);
   const [ showPassModal, setShowPassModal ] = useState(false);
 
+  const auth = useAuth()
+
   const handleSignIn = async () => {
     try{
+      Keyboard.dismiss()
       if(!loading){
         setLoading(true)
-        const loginResponse = await Login(email, password)
+        const loginResponse = await auth.Login(email, password)
         if(Boolean(loginResponse)){
           ToastAndroid.show('Login Sucessfull', 2000)
           setLoading(false)
-          props.navigation.navigate('Todos')
+          props.navigation.dispatch(
+            StackActions.replace('Todos')
+          );
         }
       }
     }catch(err){
@@ -31,9 +37,10 @@ const LoginComponent = (props) => {
 
   const handleResetEmailReuest = async () => {
     try{
+      Keyboard.dismiss()
       if(!loadingSendReset){
         setLoadingSendReset(true)
-        const resetResponse = await SendResetPassEmail(email)
+        const resetResponse = await auth.SendResetPassEmail(email)
         if(Boolean(resetResponse)){
           ToastAndroid.show('Email Sent!', 2000)
           setLoadingSendReset(false)
@@ -48,11 +55,11 @@ const LoginComponent = (props) => {
 
   const goToRegister = () => {
     props.navigation.navigate('Register')
-  }
+  } 
+
   
   return (
     <View style={styles.container}>
-      <ScrollView >
       <View style={styles.loginSvgWrapper}>
         <Image source={require('../assets/login.png')} style={styles.LoginSvg}/>
       </View>
@@ -78,7 +85,7 @@ const LoginComponent = (props) => {
           />
           <Icon
               name={hidePass ? 'eye-slash' : 'eye'}
-              size={15}
+              size={18}
               color="grey"
               onPress={() => setHidePass(!hidePass)}
               style={styles.eyeIcon}
@@ -131,7 +138,6 @@ const LoginComponent = (props) => {
           </View>
         </View>
       </Modal>
-      </ScrollView>
     </View>  );
 };
 

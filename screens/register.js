@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, Pressable , StyleSheet, TextInput, Image, ScrollView, ToastAndroid, ActivityIndicator } from "react-native";
-import { Register } from '../services/auth.service'
+import { View, Text, Pressable , StyleSheet, TextInput, Image, ToastAndroid, ActivityIndicator, Keyboard } from "react-native";
+import { useAuth } from '../services/auth.service'
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import { StackActions } from '@react-navigation/native';
+
 
 const RegisterComponent = (props) => {
 
@@ -12,15 +14,20 @@ const RegisterComponent = (props) => {
   const [ loading, setLoading ] = useState(false)
   const [ hidePass, setHidePass ] = useState(true);
 
+  const auth = useAuth()
+
   const handleSignIn = async () => {
     try{
+      Keyboard.dismiss()
       if(!loading){
         setLoading(true)
-        const registerData = await Register(email, password, { first: firstName, last: lastName })
+        const registerData = await auth.Register(email, password, { first: firstName, last: lastName })
         if(Boolean(registerData)){
           ToastAndroid.show('Registered', 2000)
           setLoading(false)
-          props.navigation.navigate('Todos')
+          props.navigation.dispatch(
+            StackActions.replace('Todos')
+          );
         }
       }
     }catch(err){
@@ -35,7 +42,6 @@ const RegisterComponent = (props) => {
   
   return (
     <View style={styles.container}>
-      <ScrollView >
       <View style={styles.loginSvgWrapper}>
         <Image source={require('../assets/register.png')} style={styles.LoginSvg}/>
       </View>
@@ -74,7 +80,7 @@ const RegisterComponent = (props) => {
           />
           <Icon
               name={hidePass ? 'eye-slash' : 'eye'}
-              size={15}
+              size={18}
               color="grey"
               onPress={() => setHidePass(!hidePass)}
               style={styles.eyeIcon}
@@ -90,7 +96,6 @@ const RegisterComponent = (props) => {
       <View style={styles.registerWrapper}>
         <Text style={styles.registerText}>Already have a account? <Text style={styles.registerNowText} onPress={() => goToLogin()}>Login here</Text></Text>
       </View>
-      </ScrollView>
     </View>  );
 };
 

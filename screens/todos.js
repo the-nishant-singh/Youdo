@@ -8,12 +8,13 @@ import {
   TextInput,
   View,
   Keyboard,
-  ScrollView 
+  ScrollView,
+  Pressable
 } from "react-native";
 import Task from "../components/Task"
 
 
-export default function Todos() {
+export default function Todos(props) {
   const [task, setTask] = useState("");
   const [taskItems, setTaskItems] = useState([]);
 
@@ -29,11 +30,20 @@ export default function Todos() {
     setTaskItems(tasksCopy);
   };
 
+  const goToProfile = () => {
+    props.navigation.navigate('Profile')
+  }
+
   return (
     <View style={styles.container}>
       <ScrollView >
       <View style={styles.tasksWrapper}>
+        <View style={styles.header}>
         <Text style={styles.sectionTitle}>Todo tasks</Text>
+        <Pressable onPress={() => goToProfile()}>
+          <Text style={styles.sectionTitle}>Profile</Text>
+          </Pressable>
+        </View>
         <View style={styles.todosContainer}>
           {taskItems.length < 1 ? (
             <View style={styles.emptyContainer}><Text>No todos found!</Text></View>
@@ -80,10 +90,15 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingHorizontal: 20,
   },
+  header: {
+    marginBottom: 20,
+    alignItems: "center",
+    justifyContent: 'space-between',
+    flexDirection: "row"
+  },
   sectionTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
   },
   todosContainer: {},
   items: {
